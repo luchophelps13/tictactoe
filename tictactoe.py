@@ -36,25 +36,48 @@ def draw_board(window):
     pygame.draw.rect(win, (0, 0, 0), square8)
     pygame.draw.rect(win, (0, 0, 0), square9)
 
-def check_for_winner(sq1, sq2, sq3):
+def check(sq1, sq2, sq3):
     if sq1 in moves_list and sq2 in moves_list and sq3 in moves_list:
         if moves_list[sq1] == moves_list[sq2] == moves_list[sq3]: 
             if moves_list[sq1] == "X":
                 win.fill((0, 255, 0))
                 textsurface = MYFONT.render("X wins!", False, (255, 255, 255))
                 win.blit(textsurface, (250, 280))
-                return
+                return True
             else:
                 win.fill((0, 0, 255))
                 textsurface = MYFONT.render("O wins!", False, (255, 255, 255))
                 win.blit(textsurface, (250, 280))
-                return
+                return True
+
+
+def check_for_winner():
+    if check("S1", "S2", "S3"):
+        return True 
+    if check("S1", "S5", "S9"):
+        return True
+    if check("S1", "S4", "S7"):
+        return True
+    if check("S2", "S5", "S8"):
+        return True
+    if check("S3", "S6", "S9"):
+        return True
+    if check("S3", "S5", "S7"):
+        return True
+    if check("S4", "S5", "S6"):
+        return True
+    if check("S7", "S8", "S9"):
+        return True
+
+    elif len(moves_list) == 9:
+        draw_game()
+        return True
 
 def draw_game():
     win.fill((255, 0, 0))
     textsurface = MYFONT.render("DRAW", False, (255, 255, 255))
     win.blit(textsurface, (250, 280))
-    
+
 
 def check_if_clicked(object, pos):
 
@@ -62,6 +85,7 @@ def check_if_clicked(object, pos):
         global num_clicks
 
         num_clicks += 1
+        
         turn = ""
 
         if object == squares[0]:
@@ -69,6 +93,7 @@ def check_if_clicked(object, pos):
             if num_clicks % 2 == 1:
                 turn = "X"
             else:
+                print("Number of clicks: ", num_clicks)
                 turn = "O"
 
             textsurface = MYFONT.render(turn, False, (255, 255, 255))
@@ -173,30 +198,41 @@ def check_if_clicked(object, pos):
             win.blit(textsurface, (540, 560))
 
         if len(moves_list) >= 5:
-            check_for_winner("S1", "S2", "S3")
-            check_for_winner("S1", "S5", "S9")
-            check_for_winner("S1", "S4", "S7")
-            check_for_winner("S2", "S5", "S8")
-            check_for_winner("S3", "S6", "S9")
-            check_for_winner("S3", "S5", "S7")
-            check_for_winner("S4", "S5", "S6")
-            check_for_winner("S7", "S8", "S9")
+            check_for_winner()
 
-            if len(moves_list) == 9:
-                draw_game()
+def restart():
+    global num_clicks
+    num_clicks = 0
+
+    moves_list.clear()
+    main()
+
             
+def main():
+    draw_board(win)
 
-draw_board(win)
+    run = True
+    while run: 
+        pygame.display.flip()
 
-run = True
-while run: 
-    pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+                
+                for square in squares:
+                    check_if_clicked(square, (x, y))
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            x, y = event.pos            
-            
-            for square in squares:
-                check_if_clicked(square, (x, y))
+                    if check_for_winner():
+                        play_again_button = pygame.Rect(265, 370, 150, 60)
+                        draw_font = pygame.font.SysFont('Comic Sans MS', 30)
+
+                        play_again_text = draw_font.render("Play Again", False, (0, 0, 0))  
+                        pygame.draw.rect(win, (255, 255, 255), play_again_button)  
+                        win.blit(play_again_text, (270, 380))
+
+                        if play_again_button.collidepoint(x, y):
+                            restart()                            
+
+main()
