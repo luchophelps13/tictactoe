@@ -10,8 +10,8 @@ win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 num_clicks = 0
 moves_list = {}
 
-def draw_board(window):
-    window.fill((122, 122, 122))
+def draw_board():
+    win.fill((122, 122, 122))
 
     square1 = pygame.Rect(20, 60, 200, 200) 
     square2 = pygame.Rect(20, 280, 200, 200)
@@ -93,7 +93,6 @@ def check_if_clicked(object, pos):
             if num_clicks % 2 == 1:
                 turn = "X"
             else:
-                print("Number of clicks: ", num_clicks)
                 turn = "O"
 
             textsurface = MYFONT.render(turn, False, (255, 255, 255))
@@ -205,13 +204,15 @@ def restart():
     num_clicks = 0
 
     moves_list.clear()
+    draw_board()
     main()
 
+draw_board()
             
 def main():
-    draw_board(win)
 
     run = True
+ 
     while run: 
         pygame.display.flip()
 
@@ -219,8 +220,9 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
+
                 x, y = event.pos
-                
+
                 for square in squares:
                     check_if_clicked(square, (x, y))
 
@@ -233,6 +235,8 @@ def main():
                         win.blit(play_again_text, (270, 380))
 
                         if play_again_button.collidepoint(x, y):
-                            restart()                            
+                            restart()
+                                                            
 
-main()
+if __name__ == "__main__":
+    main()
